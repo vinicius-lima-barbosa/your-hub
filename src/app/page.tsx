@@ -1,6 +1,6 @@
 import Event from "@/components/event";
 import Header from "@/components/header";
-import Notes from "@/components/notes";
+import Notes from "@/components/notes/notes";
 import Player from "@/components/player";
 import Pomodoro from "@/components/pomodoro";
 
