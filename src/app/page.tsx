@@ -1,8 +1,8 @@
-import Event from "@/components/event";
+import Event from "@/components/event/event";
 import Header from "@/components/header";
 import Notes from "@/components/notes/notes";
-import Player from "@/components/player";
-import Pomodoro from "@/components/pomodoro";
+import Player from "@/components/player/player";
+import Pomodoro from "@/components/pomodoro/pomodoro";
 
 export default function Home() {
   return (

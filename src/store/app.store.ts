@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-type PomodoroMode = "focus" | "short-break" | "long-break";
+export type PomodoroMode = "focus" | "short-break" | "long-break";
 
 type CountdownEvent = {
   title: string;
@@ -39,11 +39,16 @@ type AppState = {
   setPomodoroMode: (mode: PomodoroMode) => void;
   setPomodoroRunning: (isRunning: boolean) => void;
   setPomodoroRemainingSeconds: (remainingSeconds: number) => void;
+  resetPomodoro: () => void;
   setNotificationsEnabled: (notificationsEnabled: boolean) => void;
   setCountdown: (countdown: CountdownEvent) => void;
 };
 
-const DEFAULT_FOCUS_SECONDS = 25 * 60;
+export const POMODORO_DURATIONS: Record<PomodoroMode, number> = {
+  focus: 25 * 60,
+  "short-break": 5 * 60,
+  "long-break": 15 * 60,
+};
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -64,7 +69,7 @@ export const useAppStore = create<AppState>()(
       },
       pomodoro: {
         mode: "focus",
-        remainingSeconds: DEFAULT_FOCUS_SECONDS,
+        remainingSeconds: POMODORO_DURATIONS.focus,
         isRunning: false,
         notificationsEnabled: false,
       },
@@ -96,7 +101,7 @@ export const useAppStore = create<AppState>()(
           pomodoro: {
             ...state.pomodoro,
             mode,
-            remainingSeconds: DEFAULT_FOCUS_SECONDS,
+            remainingSeconds: POMODORO_DURATIONS[mode],
             isRunning: false,
           },
         })),
@@ -107,6 +112,14 @@ export const useAppStore = create<AppState>()(
       setPomodoroRemainingSeconds: (remainingSeconds) =>
         set((state) => ({
           pomodoro: { ...state.pomodoro, remainingSeconds },
+        })),
+      resetPomodoro: () =>
+        set((state) => ({
+          pomodoro: {
+            ...state.pomodoro,
+            remainingSeconds: POMODORO_DURATIONS[state.pomodoro.mode],
+            isRunning: false,
+          },
         })),
       setNotificationsEnabled: (notificationsEnabled) =>
         set((state) => ({
