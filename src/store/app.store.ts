@@ -3,7 +3,7 @@ import { createJSONStorage, persist } from "zustand/middleware";
 
 export type PomodoroMode = "focus" | "short-break" | "long-break";
 
-type CountdownEvent = {
+export type CountdownEvent = {
   title: string;
   targetDate: string;
 };
@@ -42,6 +42,7 @@ type AppState = {
   resetPomodoro: () => void;
   setNotificationsEnabled: (notificationsEnabled: boolean) => void;
   setCountdown: (countdown: CountdownEvent) => void;
+  resetCountdown: () => void;
 };
 
 export const POMODORO_DURATIONS: Record<PomodoroMode, number> = {
@@ -126,6 +127,13 @@ export const useAppStore = create<AppState>()(
           pomodoro: { ...state.pomodoro, notificationsEnabled },
         })),
       setCountdown: (countdown) => set({ countdown }),
+      resetCountdown: () =>
+        set({
+          countdown: {
+            title: "",
+            targetDate: "",
+          },
+        }),
     }),
     {
       name: "your-hub-app-store",
