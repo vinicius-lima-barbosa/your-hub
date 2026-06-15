@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Lo-Fi Focus
+
+A minimalist productivity hub for focused work.
+
+Lo-Fi Focus is a single-page application that combines a Pomodoro timer, persistent notes, milestone countdowns, and an embedded lo-fi stream player in a quiet, responsive interface.
+
+> Badges, production URL, and deployment status go here.
+
+## Features
+
+- **Lo-fi audio player**: Embedded stream playback powered by `react-player`, with persistent volume and stream selection.
+- **Persistent notes**: Local notes with auto-save and browser storage persistence.
+- **Pomodoro timer**: Focus, short break, and long break modes with persisted timer state and optional completion sound.
+- **Milestone countdown**: Track upcoming deadlines, launches, exams, or personal milestones.
+- **Muted interface**: Neutral Stone-inspired palette, low contrast surfaces, compact spacing, and distraction-free controls.
+- **Responsive layout**: Desktop grid with a productivity aside and a larger main workspace; mobile stacks content vertically.
+- **No accounts, no backend**: State lives in the browser through local storage for a friction-free experience.
+
+## Tech Stack
+
+| Area        | Technology                                 |
+| ----------- | ------------------------------------------ |
+| Framework   | Next.js App Router                         |
+| Language    | TypeScript                                 |
+| Styling     | Tailwind CSS                               |
+| State       | Zustand                                    |
+| Persistence | Browser `localStorage` via Zustand persist |
+| Icons       | `lucide-react`                             |
+| Media       | `react-player`                             |
+
+## Architecture
+
+The app is intentionally client-light and local-first.
+
+Global application state lives in `src/store/app.store.ts`. Zustand owns the shared state for notes, Pomodoro, countdown, and player settings. The store is persisted under the `your-hub-app-store` local storage key and restored on page load.
+
+Each interactive feature follows the same pattern:
+
+- A client wrapper handles hydration and local storage readiness.
+- A feature component owns the actual UI and behavior.
+- Shared state updates go through the Zustand store.
+- Browser-only APIs are isolated inside Client Components.
 
 ## Getting Started
 
-First, run the development server:
+### 1. Clone the repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/vinicius-lima-barbosa/your-hub.git
+cd your-hub
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Install dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### 3. Run the development server
 
-## Learn More
+```bash
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```txt
+src
+├── app
+│   ├── globals.css          # Global styles and theme tokens
+│   ├── layout.tsx           # Root layout and metadata
+│   └── page.tsx             # Single-page dashboard composition
+├── components
+│   ├── event                # Milestone countdown module
+│   ├── notes                # Persistent notes module
+│   ├── player               # Lo-fi stream player module
+│   ├── pomodoro             # Pomodoro timer module
+│   └── header.tsx           # Dashboard header
+├── hooks
+│   └── use-app-store-hydration.hook.ts
+├── lib
+│   └── utils.ts             # Shared utility helpers
+└── store
+    └── app.store.ts         # Zustand store and persistence setup
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The fastest path is Vercel.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. Push the repository to GitHub.
+2. Import the project in Vercel.
+3. Keep the default Next.js build settings.
+4. Deploy.
+
+The app does not require a database, authentication provider, or server-side environment variables for the core experience.
+
+## License
+
+MIT License.
+
+See `LICENSE` for details.
