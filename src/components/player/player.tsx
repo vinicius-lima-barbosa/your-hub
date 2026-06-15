@@ -1,36 +1,50 @@
-import { ListMusic, Play } from "lucide-react";
+"use client";
+
+import { ListMusic } from "lucide-react";
+import { useEffect, useState } from "react";
+
+import { useAppStore } from "@/store/app.store";
+import PlayerControls from "./player-controls";
 
 export default function Player() {
+  const [hasHydrated, setHasHydrated] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
+      setHasHydrated(true);
+    });
+
+    if (useAppStore.persist.hasHydrated()) {
+      window.queueMicrotask(() => setHasHydrated(true));
+    }
+
+    return unsubscribe;
+  }, []);
+
   return (
     <article className="rounded-lg border border-border bg-charcoal p-5 text-stone-100">
-      <div className="mb-8 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          <ListMusic className="size-4 text-stone-400" aria-hidden />
-          <h2 className="text-sm font-medium">Lo-Fi Stream</h2>
-        </div>
-        <span className="text-xs text-stone-400">Idle</span>
-      </div>
-
-      <div className="flex aspect-square flex-col justify-between rounded-lg border border-white/10 bg-white/3 p-4">
-        <div>
-          <p className="text-sm text-stone-400">Current channel</p>
-          <p className="mt-2 text-2xl font-semibold tracking-normal">
-            Beats to focus
-          </p>
-        </div>
-        <div className="flex items-center justify-between gap-4">
-          <button
-            className="inline-flex size-12 items-center justify-center rounded-md bg-stone-100 text-charcoal transition hover:bg-white"
-            type="button"
-            aria-label="Play stream"
-          >
-            <Play className="size-5 fill-current" aria-hidden />
-          </button>
-          <div className="h-1 flex-1 rounded-full bg-white/10">
-            <div className="h-full w-7/12 rounded-full bg-stone-100" />
+      {hasHydrated ? (
+        <PlayerControls />
+      ) : (
+        <>
+          <div className="mb-8 flex items-center justify-between gap-3">
+            <div className="flex items-center gap-2">
+              <ListMusic className="size-4 text-stone-400" aria-hidden />
+              <h2 className="text-sm font-medium">Lo-Fi Stream</h2>
+            </div>
+            <span className="text-xs text-stone-400">Loading...</span>
           </div>
-        </div>
-      </div>
+
+          <div className="flex aspect-square flex-col justify-between rounded-lg border border-white/10 bg-white/3 p-4">
+            <div>
+              <p className="text-sm text-stone-400">Current channel</p>
+              <p className="mt-2 text-2xl font-semibold tracking-normal text-stone-500">
+                Loading stream
+              </p>
+            </div>
+          </div>
+        </>
+      )}
     </article>
   );
 }

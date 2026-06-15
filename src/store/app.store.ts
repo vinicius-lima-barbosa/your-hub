@@ -35,6 +35,8 @@ type AppState = {
   setPlayerPlaying: (isPlaying: boolean) => void;
   setPlayerVolume: (volume: number) => void;
   setCurrentStreamIndex: (currentStreamIndex: number) => void;
+  nextPlayerStream: () => void;
+  previousPlayerStream: () => void;
   setNotesContent: (content: string) => void;
   setPomodoroMode: (mode: PomodoroMode) => void;
   setPomodoroRunning: (isRunning: boolean) => void;
@@ -51,19 +53,23 @@ export const POMODORO_DURATIONS: Record<PomodoroMode, number> = {
   "long-break": 15 * 60,
 };
 
+const PLAYER_STREAM_URLS = [
+  "https://www.youtube.com/watch?v=jfKfPfyJRdk",
+  "https://www.youtube.com/watch?v=rUxyKA_-grg",
+  "https://www.youtube.com/watch?v=4xDzrJKXOOY",
+];
+
+const createInitialPlayerState = (): PlayerState => ({
+  streamUrls: PLAYER_STREAM_URLS,
+  currentStreamIndex: 0,
+  isPlaying: false,
+  volume: 0.55,
+});
+
 export const useAppStore = create<AppState>()(
   persist(
     (set) => ({
-      player: {
-        streamUrls: [
-          "https://www.youtube.com/watch?v=jfKfPfyJRdk",
-          "https://www.youtube.com/watch?v=rUxyKA_-grg",
-          "https://www.youtube.com/watch?v=4xDzrJKXOOY",
-        ],
-        currentStreamIndex: 0,
-        isPlaying: false,
-        volume: 0.55,
-      },
+      player: createInitialPlayerState(),
       notes: {
         content: "",
         lastSavedAt: null,
@@ -84,11 +90,40 @@ export const useAppStore = create<AppState>()(
         })),
       setPlayerVolume: (volume) =>
         set((state) => ({
-          player: { ...state.player, volume },
+          player: {
+            ...state.player,
+            volume: Math.min(1, Math.max(0, volume)),
+          },
         })),
       setCurrentStreamIndex: (currentStreamIndex) =>
         set((state) => ({
-          player: { ...state.player, currentStreamIndex },
+          player: {
+            ...state.player,
+            currentStreamIndex:
+              ((currentStreamIndex % state.player.streamUrls.length) +
+                state.player.streamUrls.length) %
+              state.player.streamUrls.length,
+          },
+        })),
+      nextPlayerStream: () =>
+        set((state) => ({
+          player: {
+            ...state.player,
+            currentStreamIndex:
+              (state.player.currentStreamIndex + 1) %
+              state.player.streamUrls.length,
+          },
+        })),
+      previousPlayerStream: () =>
+        set((state) => ({
+          player: {
+            ...state.player,
+            currentStreamIndex:
+              (state.player.currentStreamIndex -
+                1 +
+                state.player.streamUrls.length) %
+              state.player.streamUrls.length,
+          },
         })),
       setNotesContent: (content) =>
         set({
@@ -139,11 +174,37 @@ export const useAppStore = create<AppState>()(
       name: "your-hub-app-store",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
-        player: state.player,
+        player: {
+          ...state.player,
+          streamUrls: PLAYER_STREAM_URLS,
+        },
         notes: state.notes,
         pomodoro: state.pomodoro,
         countdown: state.countdown,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as Partial<AppState>;
+        const persistedPlayer = persisted.player;
+        const nextPlayer = {
+          ...createInitialPlayerState(),
+          currentStreamIndex: persistedPlayer?.currentStreamIndex ?? 0,
+          isPlaying: false,
+          volume: persistedPlayer?.volume ?? 0.55,
+        };
+
+        return {
+          ...currentState,
+          ...persisted,
+          player: {
+            ...nextPlayer,
+            currentStreamIndex:
+              ((nextPlayer.currentStreamIndex % PLAYER_STREAM_URLS.length) +
+                PLAYER_STREAM_URLS.length) %
+              PLAYER_STREAM_URLS.length,
+            volume: Math.min(1, Math.max(0, nextPlayer.volume)),
+          },
+        };
+      },
     },
   ),
 );
