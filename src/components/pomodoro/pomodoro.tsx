@@ -1,25 +1,12 @@
 "use client";
 
 import { Clock3 } from "lucide-react";
-import { useEffect, useState } from "react";
 
-import { useAppStore } from "@/store/app.store";
+import { useAppStoreHydration } from "@/hooks/use-app-store-hydration.hook";
 import PomodoroTimer from "./pomodoro-timer";
 
 export default function Pomodoro() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    if (useAppStore.persist.hasHydrated()) {
-      window.queueMicrotask(() => setHasHydrated(true));
-    }
-
-    return unsubscribe;
-  }, []);
+  const hasHydrated = useAppStoreHydration();
 
   return (
     <section className="rounded-lg border border-border bg-surface p-4">

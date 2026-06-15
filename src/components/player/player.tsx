@@ -1,25 +1,12 @@
 "use client";
 
 import { ListMusic } from "lucide-react";
-import { useEffect, useState } from "react";
 
-import { useAppStore } from "@/store/app.store";
+import { useAppStoreHydration } from "@/hooks/use-app-store-hydration.hook";
 import PlayerControls from "./player-controls";
 
 export default function Player() {
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    if (useAppStore.persist.hasHydrated()) {
-      window.queueMicrotask(() => setHasHydrated(true));
-    }
-
-    return unsubscribe;
-  }, []);
+  const hasHydrated = useAppStoreHydration();
 
   return (
     <article className="rounded-lg border border-border bg-charcoal p-5 text-stone-100">

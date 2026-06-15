@@ -1,4 +1,3 @@
-import dynamic from "next/dynamic";
 import {
   CircleAlert,
   ListMusic,
@@ -8,6 +7,7 @@ import {
   SkipForward,
   Volume2,
 } from "lucide-react";
+import dynamic from "next/dynamic";
 import { useMemo, useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -23,9 +23,9 @@ const ReactPlayer = dynamic(() => import("react-player"), {
 });
 
 const STREAM_TITLES = [
-  "Lofi Girl - Beats to relax/study",
-  "Lofi Hip Hop Radio",
-  "Synthwave Radio",
+  "Batman’s Solitude",
+  "90s Gotham Nights",
+  "Milky Way Station",
 ];
 
 function getStreamTitle(streamIndex: number) {
@@ -104,9 +104,7 @@ export default function PlayerControls() {
             onPause={() => setPlayerPlaying(false)}
             onError={(error) => {
               const errorCode =
-                typeof error === "object" &&
-                error !== null &&
-                "data" in error
+                typeof error === "object" && error !== null && "data" in error
                   ? Number(error.data)
                   : null;
 

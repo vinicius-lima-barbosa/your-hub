@@ -47,6 +47,8 @@ type AppState = {
   resetCountdown: () => void;
 };
 
+export const APP_STORE_STORAGE_KEY = "your-hub-app-store";
+
 export const POMODORO_DURATIONS: Record<PomodoroMode, number> = {
   focus: 25 * 60,
   "short-break": 5 * 60,
@@ -54,9 +56,9 @@ export const POMODORO_DURATIONS: Record<PomodoroMode, number> = {
 };
 
 const PLAYER_STREAM_URLS = [
-  "https://www.youtube.com/watch?v=jfKfPfyJRdk",
-  "https://www.youtube.com/watch?v=rUxyKA_-grg",
-  "https://www.youtube.com/watch?v=4xDzrJKXOOY",
+  "https://www.youtube.com/watch?v=s87k34ud3Kc",
+  "https://www.youtube.com/watch?v=SPwoBHResEc",
+  "https://www.youtube.com/watch?v=19IFf4RV2H0",
 ];
 
 const createInitialPlayerState = (): PlayerState => ({
@@ -65,6 +67,46 @@ const createInitialPlayerState = (): PlayerState => ({
   isPlaying: false,
   volume: 0.55,
 });
+
+function getPersistedState(state: AppState) {
+  return {
+    player: {
+      ...state.player,
+      streamUrls: PLAYER_STREAM_URLS,
+    },
+    notes: state.notes,
+    pomodoro: state.pomodoro,
+    countdown: state.countdown,
+  };
+}
+
+export function ensureAppStoreStorage() {
+  if (typeof window === "undefined") {
+    return;
+  }
+
+  const currentValue = window.localStorage.getItem(APP_STORE_STORAGE_KEY);
+
+  if (currentValue) {
+    try {
+      const parsedValue = JSON.parse(currentValue) as { state?: unknown };
+
+      if (parsedValue && typeof parsedValue.state === "object") {
+        return;
+      }
+    } catch {
+      window.localStorage.removeItem(APP_STORE_STORAGE_KEY);
+    }
+  }
+
+  window.localStorage.setItem(
+    APP_STORE_STORAGE_KEY,
+    JSON.stringify({
+      state: getPersistedState(useAppStore.getState()),
+      version: 0,
+    }),
+  );
+}
 
 export const useAppStore = create<AppState>()(
   persist(
@@ -171,17 +213,9 @@ export const useAppStore = create<AppState>()(
         }),
     }),
     {
-      name: "your-hub-app-store",
+      name: APP_STORE_STORAGE_KEY,
       storage: createJSONStorage(() => localStorage),
-      partialize: (state) => ({
-        player: {
-          ...state.player,
-          streamUrls: PLAYER_STREAM_URLS,
-        },
-        notes: state.notes,
-        pomodoro: state.pomodoro,
-        countdown: state.countdown,
-      }),
+      partialize: getPersistedState,
       merge: (persistedState, currentState) => {
         const persisted = persistedState as Partial<AppState>;
         const persistedPlayer = persisted.player;

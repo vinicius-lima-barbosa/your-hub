@@ -1,8 +1,8 @@
 "use client";
 
 import { CalendarDays } from "lucide-react";
-import { useEffect, useState } from "react";
 
+import { useAppStoreHydration } from "@/hooks/use-app-store-hydration.hook";
 import { useAppStore } from "@/store/app.store";
 import EventCountdown from "./event-countdown";
 
@@ -10,19 +10,7 @@ export default function Event() {
   const countdown = useAppStore((state) => state.countdown);
   const setCountdown = useAppStore((state) => state.setCountdown);
   const resetCountdown = useAppStore((state) => state.resetCountdown);
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    if (useAppStore.persist.hasHydrated()) {
-      window.queueMicrotask(() => setHasHydrated(true));
-    }
-
-    return unsubscribe;
-  }, []);
+  const hasHydrated = useAppStoreHydration();
 
   return (
     <article className="min-h-90 rounded-lg border border-border bg-surface p-5">

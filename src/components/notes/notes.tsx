@@ -1,8 +1,8 @@
 "use client";
 
 import { NotebookPen } from "lucide-react";
-import { useEffect, useState } from "react";
 
+import { useAppStoreHydration } from "@/hooks/use-app-store-hydration.hook";
 import { useAppStore } from "@/store/app.store";
 import NotesEditor from "./notes-editor";
 
@@ -10,19 +10,7 @@ export default function Notes() {
   const notesContent = useAppStore((state) => state.notes.content);
   const lastSavedAt = useAppStore((state) => state.notes.lastSavedAt);
   const setNotesContent = useAppStore((state) => state.setNotesContent);
-  const [hasHydrated, setHasHydrated] = useState(false);
-
-  useEffect(() => {
-    const unsubscribe = useAppStore.persist.onFinishHydration(() => {
-      setHasHydrated(true);
-    });
-
-    if (useAppStore.persist.hasHydrated()) {
-      window.queueMicrotask(() => setHasHydrated(true));
-    }
-
-    return unsubscribe;
-  }, []);
+  const hasHydrated = useAppStoreHydration();
 
   return (
     <section className="flex min-h-80 flex-1 flex-col rounded-lg border border-border bg-surface p-4 shadow-[0_24px_80px_-56px_rgb(18_18_18/0.45)]">
