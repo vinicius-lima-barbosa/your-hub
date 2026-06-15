@@ -1,4 +1,5 @@
 import Event from "@/components/event/event";
+import Footer from "@/components/footer";
 import Header from "@/components/header";
 import Notes from "@/components/notes/notes";
 import Player from "@/components/player/player";
@@ -22,6 +23,7 @@ export default function Home() {
           </section>
         </section>
       </div>
+      <Footer />
     </main>
   );
 }
