@@ -14,7 +14,25 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "Your Hub",
-  description: "Minimal focus dashboard for notes, pomodoro, events, and lo-fi streams.",
+  description:
+    "Minimal focus dashboard for notes, pomodoro, events, and lo-fi streams.",
+  keywords: [
+    "notes",
+    "pomodoro",
+    "events",
+    "lo-fi streams",
+    "productivity",
+    "focus",
+    "minimalism",
+  ],
+  authors: [
+    { name: "Vinícius Barbosa", url: "https://vinicius-portfolio.vercel.app" },
+  ],
+  icons: {
+    icon: "/your-hub.png",
+    apple: "/your-hub.png",
+    shortcut: "/your-hub.png",
+  },
 };
 
 export default function RootLayout({
